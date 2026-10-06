@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Downloading product - Elvira Technologies</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/1JGJ5f6C/image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{background:#2d2d2d;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;}
+  .bar{display:flex;align-items:center;gap:16px;padding:22px 40px;}
+  .bar img{height:44px;width:auto;}
+  .bar h1{font-size:24px;font-weight:600;}
+  main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 24px 80px;gap:10px;}
+  .anim{width:280px;height:280px;border:0;background:transparent;overflow:hidden;}
+  .status{font-size:18px;color:#e6e6e6;max-width:560px;line-height:1.55;}
+  .status a,.manual a{color:#fff;font-weight:600;text-decoration:underline;}
+  .manual{margin-top:6px;font-size:16px;display:none;}
+  .files{margin-top:12px;display:none;flex-direction:column;gap:8px;align-items:center;}
+  .files a{color:#fff;background:#3b3b3b;border-radius:8px;padding:10px 16px;text-decoration:none;font-size:15px;}
+  .err h2{font-size:30px;margin-bottom:12px;}
+  .btn{display:inline-block;margin-top:18px;background:#fff;color:#000;border-radius:8px;padding:14px 26px;font:500 16px Inter,sans-serif;text-decoration:none;}
+  @media(max-width:600px){.bar{padding:16px 20px}.bar img{height:34px}.bar h1{font-size:19px}.anim{width:220px;height:220px}}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <a href="index.html"><img src="https://i.ibb.co/yBG5pb82/image-32.png" alt="Elvira Technologies logo"></a>
+    <h1>Downloading product</h1>
+  </div>
+  <main id="root">
+    <iframe class="anim" title="Downloading" src="https://lottie.host/embed/4e543ac4-33a9-444a-8b8a-30ca1a3f5c3b/SL1Lw8lHKD.lottie"></iframe>
+    <div class="status" id="status">Checking your download\u2026</div>
+    <div class="manual" id="manual"><a href="#" id="manualLink">Download not starting? Click here</a></div>
+    <div class="files" id="files"></div>
+  </main>
+  <script>
+    function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    var token=new URLSearchParams(location.search).get('t')||'';
+    var statusEl=document.getElementById('status');
+    var manual=document.getElementById('manual');
+    var filesEl=document.getElementById('files');
+    var started=false;
+
+    // Remove the token from the address bar and history right away.
+    try{history.replaceState(null,'','download.html');}catch(e){}
+
+    function fail(title,html,btn){
+      document.getElementById('root').innerHTML='<div class="err"><h2>'+esc(title)+'</h2><div class="status">'+html+'</div>'+(btn||'')+'</div>';
+    }
+
+    function redeem(){
+      return fetch('/api/shop/download?_p=redeem',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Requested-With':'elvira-shop'},body:JSON.stringify({token:token})})
+        .then(function(r){return r.json().catch(function(){return {};}).then(function(d){if(!r.ok){var e=new Error(d.error||('The server sent an unexpected response (HTTP '+r.status+').'));e.code=d.code;e.status=r.status;throw e;}return d;});});
+    }
+
+    function trigger(file,delay){
+      setTimeout(function(){
+        var a=document.createElement('a');
+        a.href=file.url;a.download=file.name;a.rel='noopener';a.style.display='none';
+        document.body.appendChild(a);a.click();setTimeout(function(){a.remove();},1500);
+      },delay||0);
+    }
+    // One file: navigate straight to it (the server sends it as an attachment, so this page stays open).
+    function startFiles(files){
+      if(files.length===1){ window.location.assign(files[0].url); return; }
+      files.forEach(function(f,i){trigger(f,i*1200);});
+    }
+
+    function begin(){
+      redeem().then(function(d){
+        started=true;
+        statusEl.innerHTML='Your download of <strong>'+esc(d.productName)+'</strong> is starting\u2026';
+        startFiles(d.files);
+        if(d.files.length>1||d.link){
+          var html=d.files.map(function(f){return '<a href="'+esc(f.url)+'" download>'+esc(f.name)+'</a>';}).join('');
+          if(d.link) html+='<a href="'+esc(d.link)+'" target="_blank" rel="noopener noreferrer">Open delivery link</a>';
+          filesEl.innerHTML=html;filesEl.style.display='flex';
+        }
+        // If the browser did not start the download, offer the manual link.
+        setTimeout(function(){manual.style.display='block';},4000);
+      }).catch(function(err){
+        if(err.code==='login_required'){location.replace('/api/auth/discord/login?next='+encodeURIComponent('/download.html?t='+token));return;}
+        if(err.code==='expired'){return fail('Download link expired','The download link has expired. Please go to <a href="dashboard.html#licenses">your licenses</a> and download the product again.','<a class="btn" href="dashboard.html#licenses">Go to my licenses</a>');}
+        if(err.code==='wrong_account'){return fail('Wrong account','This download belongs to a different Discord account, so it was not started. Log out and sign in with the account that bought this product.','<a class="btn" href="/api/auth/logout">Log out</a>');}
+        if(err.code==='revoked'){return fail('Product not available','You no longer own this product.','<a class="btn" href="dashboard.html#licenses">Go to my licenses</a>');}
+        if(err.code==='blocked'){location.href='block.html';return;}
+        if(err.code==='storage'||err.code==='empty'){return fail('Download unavailable',esc(err.message),'<a class="btn" href="dashboard.html#licenses">Go to my licenses</a>');}
+        fail('Download unavailable',esc(err.message),'<a class="btn" href="dashboard.html#licenses">Go to my licenses</a>');
+      });
+    }
+
+    document.getElementById('manualLink').addEventListener('click',function(e){
+      e.preventDefault();
+      redeem().then(function(d){startFiles(d.files);}).catch(function(err){
+        if(err.code==='expired') fail('Download link expired','The download link has expired. Please go to <a href="dashboard.html#licenses">your licenses</a> and download the product again.','<a class="btn" href="dashboard.html#licenses">Go to my licenses</a>');
+      });
+    });
+
+    if(token.length<20){fail('Invalid link','This download link is not valid. You can download your products from <a href="dashboard.html#licenses">your licenses</a>.');}
+    else{begin();}
+  </script>
+</body>
+</html>

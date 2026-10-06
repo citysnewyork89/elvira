@@ -1,0 +1,9 @@
+# Never deployed: setup / internal files that must not be reachable on the website.
+roblox-game
+supabase-setup.sql
+README.md
+.env.example
+.env*
+package-lock.json
+bot
+INSTRUCCIONES.md

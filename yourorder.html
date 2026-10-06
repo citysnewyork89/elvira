@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Your order - Elvira Technologies</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/1JGJ5f6C/image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/elvira-shell.css">
+<style>
+  main.order{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 146px);}
+  .order__summary{background:#2d2d2d;color:#fff;padding:56px 56px 64px;}
+  .order__summary h1{font-size:36px;font-weight:700;margin-bottom:28px;}
+  .order__pay{background:#fff;color:#000;padding:56px;display:flex;flex-direction:column;gap:18px;}
+  .order__pay h2{font-size:28px;font-weight:700;}
+  .o-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.14);}
+  .o-item img{width:64px;height:64px;border-radius:8px;object-fit:cover;background:#3b3b3b;flex-shrink:0;}
+  .o-item__name{flex:1;min-width:0;font-size:17px;font-weight:600;overflow-wrap:anywhere;}
+  .o-item__price{text-align:right;font-weight:600;white-space:nowrap;}
+  .o-item__price s{display:block;color:#a3a3a3;font-weight:400;font-size:14px;}
+  .o-item__offer{font-size:13px;color:#c9c9c9;font-weight:400;margin-top:3px;}
+  .o-rows{margin-top:22px;display:flex;flex-direction:column;gap:10px;font-size:16px;}
+  .o-row{display:flex;justify-content:space-between;gap:16px;}
+  .o-row.muted{color:#c9c9c9;}
+  .o-row.total{font-size:24px;font-weight:700;margin-top:10px;padding-top:16px;border-top:1px solid rgba(255,255,255,.25);}
+  .o-coupon{display:flex;gap:10px;margin-top:26px;}
+  .o-coupon input{flex:1;min-width:0;background:#3b3b3b;border:1px solid #555;color:#fff;border-radius:8px;padding:12px 14px;font:500 15px Inter,sans-serif;text-transform:uppercase;}
+  .o-coupon input::placeholder{color:#9a9a9a;text-transform:none;}
+  .o-coupon button{background:#fff;color:#000;border:none;border-radius:8px;padding:0 20px;font:500 15px Inter,sans-serif;cursor:pointer;}
+  .o-msg{font-size:14px;margin-top:8px;min-height:18px;}
+  .o-msg.err{color:#ff9d9d;}.o-msg.ok{color:#9be3a8;}
+  .btn-discord{display:inline-flex;align-items:center;justify-content:center;gap:12px;background:#000;color:#fff;text-decoration:none;border:none;border-radius:8px;padding:16px 28px;font:500 18px Inter,sans-serif;cursor:pointer;align-self:flex-start;}
+  .btn-discord img{width:26px;height:26px;}
+  .btn-black{background:#000;color:#fff;border:none;border-radius:8px;padding:14px 24px;font:500 16px Inter,sans-serif;cursor:pointer;text-decoration:none;display:inline-block;}
+  .pay-note{font-size:15px;color:#454545;line-height:1.55;}
+  .pay-err{background:#FDECEC;color:#8a1f1f;border-radius:8px;padding:12px 14px;font-size:15px;}
+  .pay-info{background:#F7F7F7;border-radius:8px;padding:12px 14px;font-size:15px;}
+  .f-field{display:flex;flex-direction:column;gap:8px;}
+  .f-field label{font-size:14px;font-weight:600;}
+  .f-field input[type=text],.f-field input[type=email]{width:100%;border:1px solid #cfcfcf;border-radius:8px;padding:13px 14px;font:400 16px Inter,sans-serif;background:#fff;color:#000;}
+  .f-field input[readonly]{background:#F7F7F7;color:#454545;}
+  .f-field small{font-size:13px;color:#828282;}
+  .email-row{display:flex;gap:10px;align-items:center;}
+  .email-row input{flex:1;min-width:0;}
+  .icon-btn{background:#fff;border:1px solid #cfcfcf;border-radius:8px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .icon-btn .material-symbols-outlined{font-size:22px;color:#000;}
+  .terms{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.5;color:#2d2d2d;cursor:pointer;}
+  .terms input{width:22px;height:22px;accent-color:#000;margin-top:2px;flex-shrink:0;cursor:pointer;}
+  .terms a{color:#000;font-weight:600;}
+  .btn-black:disabled{opacity:.45;cursor:not-allowed;}
+  .waiting{display:flex;flex-direction:column;gap:16px;align-items:flex-start;}
+  .waiting .btn-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn-light{background:#fff;color:#000;border:1px solid #000;border-radius:8px;padding:14px 24px;font:500 16px Inter,sans-serif;cursor:pointer;text-decoration:none;display:inline-block;}
+  .pay-email{display:flex;gap:10px;flex-wrap:wrap;}
+  .pay-email input{flex:1;min-width:200px;border:1px solid #cfcfcf;border-radius:8px;padding:12px 14px;font:400 16px Inter,sans-serif;}
+  .pay-link{font-size:14px;color:#454545;}
+  .spinner{width:28px;height:28px;border:3px solid #e6e6e6;border-top-color:#000;border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .empty-order{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:80px 24px;text-align:center;}
+  .empty-order h1{font-size:30px;}
+  @media (max-width:900px){main.order{grid-template-columns:1fr;min-height:0;}.order__summary,.order__pay{padding:36px 24px;}#payFrame{height:700px;}}
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="logo"><img src="https://i.ibb.co/yBG5pb82/image-32.png" alt="Elvira Technologies logo"></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="store.html" class="nav-link">Store</a>
+      <a href="dashboard.html#licenses" class="nav-link">Your Licences</a>
+      <a href="helpcenter.html" class="nav-link">Help Center</a>
+      <a href="/api/auth/discord/login" class="login-btn" id="loginBtn">Log in</a>
+    </nav>
+  </header>
+
+  <main class="order" id="orderRoot">
+    <section class="order__summary" id="summary">
+      <h1>Your order summary</h1>
+      <div id="summaryBody"><div class="spinner" style="border-color:#555;border-top-color:#fff"></div></div>
+    </section>
+    <section class="order__pay" id="payPane">
+      <h2>Purchase details</h2>
+      <div id="payBody"><div class="spinner"></div></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer__brand">
+      <div class="footer__brand-top"><img src="https://i.ibb.co/YTDKf9D7/image.png" alt="Elvira Technologies"><span>Elvira technologies</span></div>
+      <div class="footer__socials">
+        <a href="https://discord.gg/4bZDmEagpH" target="_blank" rel="noopener"><img src="https://i.ibb.co/v4B5LV3s/image.png" alt="Discord"></a>
+        <a href="https://www.roblox.com/es/communities/32391054/Aena-Group#!/about" target="_blank" rel="noopener"><img src="https://i.ibb.co/0pCpMZkv/image.png" alt="Roblox"></a>
+      </div>
+    </div>
+    <div class="footer__links">
+      <h4>Of Interest</h4>
+      <a href="helpcenter.html">Help center</a>
+      <a href="store.html">Products</a>
+      <a href="dashboard.html#licenses">Your Licences</a>
+    </div>
+    <div class="footer__payments"><img src="https://i.ibb.co/4ZsXPvNX/image.png" alt="Accepted payment methods"></div>
+  </footer>
+
+  <script>
+    var navToggle = document.getElementById('navToggle');
+    var mainNav = document.getElementById('mainNav');
+    navToggle.addEventListener('click', function () { mainNav.classList.toggle('open'); navToggle.classList.toggle('open'); });
+
+    function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    function euro(n){return '\u20AC'+(Math.round((n||0)*100)/100).toFixed(2);}
+    var UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    function flatApi(u){var m=/^(\/api\/[^\/?#]+\/[^\/?#]+)(\/[^?#]*)?(\?[^#]*)?$/.exec(u);if(!m||!m[2])return u;return m[1]+'?_p='+encodeURIComponent(m[2].replace(/^\//,''))+(m[3]?'&'+m[3].slice(1):'');}
+    function api(path, body){
+      return fetch(flatApi('/api/shop/'+path),{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Requested-With':'elvira-shop'},body:JSON.stringify(body||{})})
+        .then(function(r){return r.json().catch(function(){return {};}).then(function(d){if(!r.ok){var e=new Error(d.error||('The server sent an unexpected response (HTTP '+r.status+').'));e.code=d.code;e.detail=d.detail;throw e;}return d;});});
+    }
+
+    // ----- what is being bought -----
+    function readIds(){
+      var list=[];
+      try{list=JSON.parse(sessionStorage.getItem('elviraCheckout')||'[]');}catch(e){}
+      if(!list.length){try{list=JSON.parse(localStorage.getItem('elviraCheckoutLast')||'[]');}catch(e){}}
+      if(!list.length){try{list=JSON.parse(localStorage.getItem('elviraCart')||'[]');}catch(e){}}
+      return list.filter(function(id){return UUID.test(id);}).slice(0,25);
+    }
+    var ids=readIds();
+    try{localStorage.setItem('elviraCheckoutLast',JSON.stringify(ids));}catch(e){}
+
+    var session=null, quote=null, coupon='', orderCode='', poll=null;
+
+    var params=new URLSearchParams(location.search);
+    var wasCancelled=params.get('cancelled')==='1';
+
+    // ----- summary (dark half) -----
+    function renderSummary(){
+      var q=quote, el=document.getElementById('summaryBody');
+      var rows='';
+      var itemsHtml=q.items.map(function(i){
+        var price=i.finalPrice<i.originalPrice?'<s>'+euro(i.originalPrice)+'</s>'+euro(i.finalPrice):euro(i.finalPrice);
+        var offer=i.offerName?'<div class="o-item__offer">Offer applied: '+esc(i.offerName)+'</div>':'';
+        return '<div class="o-item"><img src="'+esc(i.image||'https://i.ibb.co/v4Fk3Cjf/image.png')+'" alt=""><div class="o-item__name">'+esc(i.name)+offer+'</div><div class="o-item__price">'+price+'</div></div>';
+      }).join('');
+      rows+='<div class="o-row muted"><span>Subtotal</span><span>'+euro(q.subtotal)+'</span></div>';
+      if(q.discount>0) rows+='<div class="o-row muted"><span>Total discounts</span><span>-'+euro(q.discount)+'</span></div>';
+      if(q.offers&&q.offers.length) rows+='<div class="o-row muted"><span>Offers applied</span><span>'+q.offers.map(esc).join(', ')+'</span></div>';
+      if(q.coupon) rows+='<div class="o-row muted"><span>Coupon '+esc(q.coupon.code)+'</span><span>-'+euro(q.coupon.amount)+'</span></div>';
+      rows+='<div class="o-row total"><span>Total to pay</span><span>'+euro(q.total)+'</span></div>';
+      el.innerHTML=itemsHtml+'<div class="o-coupon"><input id="couponInput" type="text" maxlength="30" placeholder="Coupon code" value="'+esc(coupon)+'" autocomplete="off"><button id="couponBtn" type="button">Apply</button></div><div class="o-msg" id="couponMsg"></div><div class="o-rows">'+rows+'</div>';
+      var msg=document.getElementById('couponMsg');
+      if(q.couponError){msg.className='o-msg err';msg.textContent=q.couponError;}
+      else if(q.coupon){msg.className='o-msg ok';msg.textContent='Coupon applied.';}
+      document.getElementById('couponBtn').addEventListener('click',function(){
+        coupon=document.getElementById('couponInput').value.trim().toUpperCase();
+        loadQuote(true);
+      });
+      document.getElementById('couponInput').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('couponBtn').click();});
+    }
+
+    function loadQuote(restartPayment){
+      return api('quote',{ids:ids,coupon:coupon}).then(function(q){
+        quote=q;
+        if(q.couponError) coupon='';
+        renderSummary();
+      });
+    }
+
+    // ----- purchase details + payment (white half) -----
+    function payBody(html){document.getElementById('payBody').innerHTML=html;}
+    var waiting=false;
+
+    function renderPay(){
+      if(!quote) return;
+      if(waiting) return;
+      if(quote.owned&&quote.owned.length){
+        payBody('<div class="pay-err">You already own: '+quote.owned.map(esc).join(', ')+'. Go back to your cart and remove it to continue.</div><a class="btn-black" href="store.html">Back to the store</a>');
+        return;
+      }
+      if(!session||!session.loggedIn){
+        payBody('<p class="pay-note">Log in with Discord to continue with your purchase. You will come back to this page right after logging in.</p>'+
+          '<a class="btn-discord" href="/api/auth/discord/login?next='+encodeURIComponent('/yourorder.html')+'"><img src="https://i.ibb.co/4n3Xnm9g/image.png" alt="">Log in</a>');
+        return;
+      }
+      if(session.blocked){location.href='block.html';return;}
+      if(!session.robloxVerified){
+        payBody('<p class="pay-note">Before paying, you need to verify your Roblox account. It only takes a minute and you will return here afterwards.</p>'+
+          '<a class="btn-black" href="/api/auth/discord/login?next='+encodeURIComponent('/yourorder.html')+'">Verify my Roblox account</a>');
+        return;
+      }
+      showForm();
+    }
+
+    function showForm(message){
+      payBody(
+        '<div class="f-field"><label for="fDiscord">Discord username</label><input id="fDiscord" type="text" readonly value="'+esc(session.discordUsername)+'"></div>'+
+        '<div class="f-field"><label for="fRoblox">Roblox username</label><input id="fRoblox" type="text" readonly value="'+esc(session.robloxUsername||'')+'"></div>'+
+        '<div class="f-field"><label for="emailInput">Email</label><div class="email-row"><input id="emailInput" type="email" readonly autocomplete="email" value="'+esc(email)+'"><button class="icon-btn" id="editEmail" type="button" aria-label="Edit email for this purchase" title="Edit email"><span class="material-symbols-outlined">edit</span></button></div><small>Your receipt will be sent to this email. Changing it only applies to this purchase.</small></div>'+
+        '<label class="terms"><input type="checkbox" id="terms"><span>I accept the <a href="terms.html#purchase-terms" target="_blank" rel="noopener">Purchase Terms</a> and the <a href="terms.html#product-policy" target="_blank" rel="noopener">Product Policy</a> of Elvira Technologies Group.</span></label>'+
+        '<div class="pay-err" id="formErr" style="display:none"></div>'+
+        '<button class="btn-black" id="continueBtn" type="button">Continue to payment</button>'+
+        '<p class="pay-note" style="font-size:14px">A secure Shoppex payment page will open in a new tab. Keep this page open until the payment is finished.</p>');
+      if(message) formError(message);
+      document.getElementById('editEmail').addEventListener('click',function(){
+        var inp=document.getElementById('emailInput'); inp.readOnly=false; inp.focus(); inp.select();
+      });
+      document.getElementById('continueBtn').addEventListener('click',onContinue);
+    }
+    function formError(msg){var el=document.getElementById('formErr'); if(!el)return; el.textContent=msg; el.style.display=msg?'block':'none';}
+
+    var email='';
+    function onContinue(){
+      var btn=document.getElementById('continueBtn');
+      var value=document.getElementById('emailInput').value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)){formError('Please enter a valid email address for your receipt.');return;}
+      if(!document.getElementById('terms').checked){formError('You must accept the Purchase Terms and the Product Policy to continue.');return;}
+      formError('');
+      email=value;
+      btn.disabled=true; btn.textContent='Preparing your payment\u2026';
+      // The new tab must be opened inside the click, otherwise browsers block it.
+      var tab=null;
+      try{tab=window.open('about:blank','_blank'); if(tab){tab.document.write('<title>Elvira</title><body style="font-family:sans-serif;padding:40px;color:#2d2d2d">Opening the secure payment page\u2026</body>');}}catch(e){}
+      api('checkout',{ids:ids,coupon:coupon,email:email,acceptTerms:true}).then(function(r){
+        if(r.free){if(tab)tab.close();return done(r.orderCode);}
+        orderCode=r.orderCode; payUrl=r.payUrl;
+        var opened=false;
+        if(tab&&!tab.closed){try{tab.location.href=r.payUrl;opened=true;}catch(e){}}
+        showWaiting(opened);
+        startPolling();
+      }).catch(function(err){
+        if(tab)tab.close();
+        if(err.code==='login_required'||err.code==='verify_required'){session=null;return renderPay();}
+        showForm(err.message+(err.detail?' ['+err.detail+']':''));
+        document.getElementById('emailInput').value=email;
+      });
+    }
+
+    var payUrl='';
+    function showWaiting(opened){
+      waiting=true;
+      payBody('<div class="waiting"><div class="spinner"></div>'+
+        '<h3 style="font-size:22px">Waiting for your payment</h3>'+
+        '<p class="pay-note">'+(opened?'The secure Shoppex payment page was opened in a new tab. ':'Your browser blocked the new tab. Use the button below to open the secure payment page. ')+'Complete the payment there and keep <strong>this page open</strong>: we will detect the payment automatically.</p>'+
+        '<div class="btn-row"><a class="btn-black" href="'+esc(payUrl)+'" target="_blank" rel="noopener">'+(opened?'Open the payment page again':'Open the payment page')+'</a>'+
+        '<button class="btn-light" id="cancelPay" type="button">Cancel</button></div></div>');
+      document.getElementById('cancelPay').addEventListener('click',function(){
+        this.disabled=true;
+        api('order/cancel',{o:orderCode}).catch(function(){}).then(function(){
+          stopPolling(); waiting=false; orderCode=''; renderPay();
+        });
+      });
+    }
+
+    function stopPolling(){ if(poll){clearInterval(poll);poll=null;} }
+    function startPolling(){
+      stopPolling();
+      var check=function(){
+        fetch('/api/shop/order?o='+encodeURIComponent(orderCode),{credentials:'same-origin'})
+          .then(function(r){return r.json();})
+          .then(function(o){
+            if(!orderCode) return;
+            if(o.status==='paid'){stopPolling();done(orderCode);}
+            else if(o.status==='unpaid'||o.status==='error'){stopPolling();waiting=false;var c=orderCode;orderCode='';location.replace('ordererror.html?o='+encodeURIComponent(c));}
+          }).catch(function(){});
+      };
+      poll=setInterval(check,3000);
+    }
+
+    // Closing or refreshing this page while paying: the sale is no longer "pending".
+    window.addEventListener('pagehide',function(){
+      if(waiting&&orderCode){try{navigator.sendBeacon('/api/shop/leave?o='+encodeURIComponent(orderCode),new Blob(['{}'],{type:'text/plain'}));}catch(e){}}
+    });
+
+    function done(code){
+      waiting=false;
+      try{
+        var bought=JSON.parse(localStorage.getItem('elviraCheckoutLast')||'[]');
+        var cart=JSON.parse(localStorage.getItem('elviraCart')||'[]').filter(function(id){return bought.indexOf(id)===-1;});
+        localStorage.setItem('elviraCart',JSON.stringify(cart));
+        sessionStorage.removeItem('elviraCheckout');
+      }catch(e){}
+      location.replace('ordercompleted.html?o='+encodeURIComponent(code));
+    }
+
+    // ----- boot -----
+    function boot(){
+      if(!ids.length){
+        document.getElementById('orderRoot').innerHTML='<div class="empty-order"><h1>Your order is empty</h1><p class="pay-note">Add a product to your cart to continue.</p><a class="btn-black" href="store.html">Go to the store</a></div>';
+        return;
+      }
+      loadQuote(false).then(function(){
+        if(session!==null) renderPay();
+      }).catch(function(err){
+        document.getElementById('summaryBody').innerHTML='<p>'+esc(err.message)+'</p><p style="margin-top:14px"><a style="color:#fff" href="store.html">Back to the store</a></p>';
+        document.getElementById('payBody').innerHTML='';
+      });
+    }
+    document.addEventListener('elvira:session',function(e){
+      session=e.detail||{loggedIn:false};
+      email=session.email||email;
+      if(quote) renderPay();
+    });
+    boot();
+  </script>
+  <script src="assets/js/elvira-auth.js"></script>
+  <script src="assets/js/elvira-cart.js"></script>
+</body>
+</html>

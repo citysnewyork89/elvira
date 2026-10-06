@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Store - Elvira Technologies</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/1JGJ5f6C/image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+<style>
+  :root{
+    --dark:#2D2D2D;
+    --light-bg:#F7F7F7;
+    --muted:#828282;
+    --btn-alt:#E6E6E6;
+    --radius:8px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter', sans-serif;
+    color:#000;
+    background:#fff;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    padding-top:146px;
+  }
+  img{display:block;max-width:100%;}
+  a{color:inherit;}
+
+  /* ---------- Preloader ---------- */
+  #preloader{
+    position:fixed;
+    inset:0;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    transition:opacity .3s ease;
+  }
+  #preloader img{
+    width:78px;
+    opacity:0;
+    transform:scale(.9);
+    animation:logoIn .7s ease forwards;
+  }
+  @keyframes logoIn{
+    to{opacity:1;transform:scale(1);}
+  }
+  #preloader.hidden{opacity:0;pointer-events:none;}
+  .slow-msg{
+    position:absolute;
+    left:50%;
+    bottom:56px;
+    transform:translateX(-50%);
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    font-weight:400;
+    color:#828282;
+    text-align:center;
+    white-space:nowrap;
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .slow-msg.visible{opacity:1;}
+
+  /* ---------- Page transition ---------- */
+  #pageTransition{
+    position:fixed;
+    inset:0;
+    background:#fff;
+    z-index:10000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  #pageTransition.visible{opacity:1;pointer-events:auto;}
+  .pt-loader{width:96px;height:96px;}
+  .pt-loader svg{width:100%;height:100%;}
+
+  /* ---------- Header ---------- */
+  header.site-header{
+    width:100%;
+    height:146px;
+    background:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 56px;
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:20;
+  }
+  .site-header .logo img{height:44px;width:auto;}
+  nav.main-nav{
+    display:flex;
+    align-items:center;
+    gap:36px;
+  }
+  nav.main-nav a.nav-link{
+    color:#fff;
+    font-size:20px;
+    font-weight:500;
+    text-decoration:none;
+    white-space:nowrap;
+    transition:opacity .25s ease;
+  }
+  nav.main-nav a.nav-link:hover{opacity:.7;}
+  a.login-btn{
+    background:#fff;
+    color:#000;
+    font-size:16px;
+    font-weight:400;
+    text-decoration:none;
+    padding:10px 22px;
+    border-radius:var(--radius);
+    transition:transform .2s ease, opacity .2s ease;
+    margin-left:8px;
+  }
+  a.login-btn:hover{opacity:.85;}
+
+  .nav-toggle{
+    display:none;
+    flex-direction:column;
+    gap:5px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:8px;
+  }
+  .nav-toggle span{width:26px;height:2px;background:#fff;display:block;transition:transform .3s ease, opacity .3s ease;}
+  .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .nav-toggle.open span:nth-child(2){opacity:0;}
+  .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+  /* ---------- Search hero ---------- */
+  .search-hero{
+    width:100%;
+    height:357px;
+    background:var(--dark);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:0 24px;
+  }
+  .search-hero h1{
+    color:#fff;
+    font-size:48px;
+    font-weight:600;
+  }
+  .search-hero p{
+    color:#fff;
+    font-size:24px;
+    font-weight:500;
+    margin-top:14px;
+    max-width:640px;
+  }
+  .search-box{
+    margin-top:32px;
+    width:674px;
+    max-width:100%;
+    height:65px;
+    background:#fff;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    padding:0 28px;
+  }
+  .search-box input{
+    border:none;
+    outline:none;
+    width:100%;
+    background:transparent;
+    font-family:'Inter', sans-serif;
+    font-size:20px;
+    font-weight:400;
+    color:#000;
+  }
+  .search-box input::placeholder{color:#828282;}
+
+  .search-gradient{
+    width:100%;
+    height:147px;
+    background:linear-gradient(to bottom, var(--dark) 0%, rgba(45,45,45,0) 100%);
+  }
+
+  /* ---------- Search results ---------- */
+  .search-results{
+    max-width:1260px;
+    margin:0 auto;
+    padding:0 56px;
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .search-results.visible{
+    max-height:none;
+    opacity:1;
+    padding:36px 56px 8px;
+  }
+  .search-results__count{
+    font-size:20px;
+    font-weight:400;
+    color:#000;
+    text-align:left;
+    margin-bottom:28px;
+  }
+  .no-results{
+    font-size:18px;
+    font-weight:400;
+    color:var(--muted);
+    text-align:left;
+    padding:12px 0 8px;
+  }
+
+  /* ---------- Products grid (shared) ---------- */
+  .products-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:32px;
+    max-width:1260px;
+    margin:0 auto;
+    justify-items:stretch;
+  }
+  .product-card{
+    width:100%;
+    max-width:391.63px;
+    justify-self:center;
+    min-height:480px;
+    background:#fff;
+    border:1px solid #D9D9D9;
+    border-radius:var(--radius);
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    opacity:0;
+    transform:translateY(16px);
+    animation:cardIn .6s ease forwards;
+  }
+  @keyframes cardIn{to{opacity:1;transform:translateY(0);}}
+  .product-card__img{
+    width:100%;
+    height:247px;
+    object-fit:cover;
+    border-radius:6px;
+    background:var(--light-bg);
+  }
+  .product-card__media{
+    position:relative;
+  }
+  .product-card__label,
+  .product-card__badge{
+    position:absolute;
+    top:10px;
+    background:#000;
+    color:#fff;
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    padding:5px 12px;
+    border-radius:999px;
+  }
+  .product-card__label{left:10px;}
+  .product-card__badge{right:10px;background:#c0392b;}
+  .product-card__title{
+    font-size:24px;
+    font-weight:400;
+    color:#000;
+    margin-top:16px;
+    text-align:left;
+  }
+  .product-card__price{
+    font-size:24px;
+    font-weight:600;
+    color:#000;
+    margin-top:6px;
+    text-align:left;
+  }
+  .product-card__actions{
+    margin-top:auto;
+    display:flex;
+    gap:10px;
+    padding-top:18px;
+  }
+  .btn-view{
+    flex:1;
+    background:#000;
+    color:#fff;
+    text-align:center;
+    padding:13px 0;
+    border-radius:var(--radius);
+    text-decoration:none;
+    font-size:16px;
+    font-weight:400;
+  }
+  .btn-cart{
+    width:48px;
+    height:48px;
+    background:var(--btn-alt);
+    border:none;
+    border-radius:var(--radius);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+    transition:background .2s ease;
+  }
+  .btn-cart img{width:20px;height:20px;}
+  .btn-cart.added{background:#c9c9c9;}
+
+  /* ---------- Our Products ---------- */
+  .our-products{
+    padding:96px 56px 80px;
+    text-align:left;
+  }
+  .our-products h2{
+    font-size:48px;
+    font-weight:600;
+    color:#000;
+  }
+  .our-products__desc{
+    font-size:20px;
+    font-weight:500;
+    color:#000;
+    max-width:920px;
+    margin:22px 0 28px;
+    line-height:1.55;
+  }
+  .our-products__count{
+    font-size:20px;
+    font-weight:500;
+    color:#000;
+    margin-bottom:32px;
+  }
+  .show-more{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin:48px auto 0;
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:'Inter', sans-serif;
+    font-size:20px;
+    font-weight:400;
+    color:#000;
+    transition:opacity .2s ease;
+  }
+  .show-more:hover{opacity:.65;}
+  .show-more .material-symbols-outlined{font-size:22px;}
+  .show-more.hidden{display:none;}
+
+  /* ---------- Discount section ---------- */
+  .discount{
+    width:100%;
+    min-height:554px;
+    background:var(--light-bg);
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:32px;
+    padding:64px 56px 0;
+    overflow:visible;
+  }
+  .discount__text{
+    max-width:540px;
+    padding-bottom:80px;
+  }
+  .discount__text h2{
+    font-size:64px;
+    font-weight:700;
+    color:#000;
+    line-height:1.08;
+  }
+  .discount__text p{
+    font-size:24px;
+    font-weight:400;
+    color:#000;
+    margin-top:20px;
+    line-height:1.4;
+  }
+  .discount__btn{
+    display:inline-block;
+    margin-top:32px;
+    background:#000;
+    color:#fff;
+    padding:15px 34px;
+    border-radius:var(--radius);
+    text-decoration:none;
+    font-size:18px;
+    font-weight:400;
+  }
+  .discount__image{
+    width:717px;
+    max-width:48%;
+    opacity:0;
+    transform:translateY(24px);
+    animation:discountIn 1s ease forwards;
+    animation-delay:.2s;
+  }
+  .discount__image img{width:100%;height:auto;display:block;}
+  @keyframes discountIn{to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- Footer (shared) ---------- */
+  footer.site-footer{
+    width:100%;
+    min-height:264px;
+    background:#fff;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:40px;
+    padding:44px 56px;
+  }
+  .footer__brand{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:170px;
+  }
+  .footer__brand-top{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .footer__brand-top img{width:44px;height:43px;}
+  .footer__brand-top span{
+    font-size:24px;
+    font-weight:400;
+    color:#000;
+  }
+  .footer__socials{
+    display:flex;
+    gap:14px;
+    margin-top:32px;
+  }
+  .footer__socials a img{width:32px;height:32px;transition:opacity .2s ease;}
+  .footer__socials a:hover img{opacity:.7;}
+  .footer__links h4{
+    font-size:16px;
+    font-weight:500;
+    color:#000;
+    margin-bottom:14px;
+  }
+  .footer__links a{
+    display:block;
+    font-size:16px;
+    font-weight:400;
+    color:#000;
+    text-decoration:none;
+    margin-bottom:10px;
+    transition:opacity .2s ease;
+  }
+  .footer__links a:hover{opacity:.6;}
+  .footer__payments{align-self:flex-end;}
+  .footer__payments img{max-width:180px;}
+
+  /* ---------- Scroll to top ---------- */
+  #scrollTop{
+    position:fixed;
+    right:28px;
+    bottom:32px;
+    width:52px;
+    height:52px;
+    border:none;
+    border-radius:50%;
+    background:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transform:translateY(10px);
+    transition:opacity .3s ease, transform .3s ease;
+    z-index:50;
+  }
+  #scrollTop.visible{opacity:1;pointer-events:auto;transform:translateY(0);}
+  #scrollTop .material-symbols-outlined{font-size:26px;line-height:1;}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .products-grid{grid-template-columns:repeat(2, 1fr);}
+  }
+
+  @media (max-width:768px){
+    body{padding-top:88px;}
+    header.site-header{padding:0 24px;height:88px;}
+    .site-header .logo img{height:34px;}
+    .nav-toggle{display:flex;}
+    nav.main-nav{
+      position:absolute;
+      top:88px;left:0;
+      width:100%;
+      background:var(--dark);
+      flex-direction:column;
+      align-items:flex-start;
+      gap:0;
+      max-height:0;
+      padding:0 24px;
+      overflow:hidden;
+      transition:max-height .35s ease, padding .35s ease;
+    }
+    nav.main-nav.open{max-height:400px;padding:12px 24px 20px;}
+    nav.main-nav a.nav-link{padding:12px 0;width:100%;}
+    a.login-btn{margin:12px 0 0;}
+    .user-menu{margin:12px 0 0;width:100%;}
+    .user-menu__trigger{width:100%;justify-content:space-between;}
+    .user-menu__dropdown{position:static;box-shadow:none;border:1px solid #eee;margin-top:8px;opacity:1;pointer-events:auto;transform:none;display:none;padding:8px;}
+    .user-menu__dropdown.open{display:block;}
+
+    .search-hero{height:auto;padding:56px 20px;}
+    .search-hero h1{font-size:32px;}
+    .search-hero p{font-size:17px;}
+    .search-gradient{height:100px;}
+
+    .search-results{padding:0 20px;}
+    .search-results.visible{padding:28px 20px 8px;}
+
+    .products-grid{grid-template-columns:1fr;gap:24px;}
+
+    .our-products{padding:64px 20px;}
+    .our-products h2{font-size:32px;}
+    .our-products__desc{font-size:16px;}
+
+    .discount{padding:48px 20px 0;justify-content:center;text-align:center;}
+    .discount__text{padding-bottom:32px;max-width:100%;}
+    .discount__text h2{font-size:36px;}
+    .discount__text p{font-size:18px;}
+    .discount__image{max-width:70%;margin:0 auto;}
+
+    footer.site-footer{padding:36px 24px;}
+    .footer__payments{align-self:flex-start;}
+    .slow-msg{white-space:normal;max-width:260px;}
+  }
+
+  /* ---------- User menu (logged-in header) ---------- */
+  .user-menu{position:relative;margin-left:8px;}
+  .user-menu__trigger{display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;font-family:'Inter', sans-serif;transition:background .2s ease;}
+  .user-menu__trigger:hover{background:rgba(255,255,255,.1);}
+  .user-menu__avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#828282;flex-shrink:0;}
+  .user-menu__name{color:#fff;font-size:16px;font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .user-menu__chevron{color:#fff;font-size:20px;transition:transform .25s ease;}
+  .user-menu__trigger.open .user-menu__chevron{transform:rotate(180deg);}
+  .user-menu__dropdown{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:200px;padding:8px;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .2s ease, transform .2s ease;z-index:40;}
+  .user-menu__dropdown.open{opacity:1;pointer-events:auto;transform:translateY(0);}
+  .user-menu__dropdown a,.user-menu__dropdown button{display:block;width:100%;text-align:left;background:none;border:none;font-family:'Inter', sans-serif;font-size:15px;font-weight:500;color:#000;text-decoration:none;padding:10px 12px;border-radius:6px;cursor:pointer;}
+  .user-menu__dropdown a:hover,.user-menu__dropdown button:hover{background:#F7F7F7;}
+</style>
+</head>
+<body>
+
+  <div id="preloader">
+    <img src="https://i.ibb.co/YTDKf9D7/image.png" alt="Elvira Technologies">
+    <span class="slow-msg" id="slowMsg">Loading is taking longer than usual…</span>
+  </div>
+  <script>
+    // If we arrived here by clicking a link elsewhere on the site,
+    // the page-transition screen already covered the wait — skip
+    // this page's own logo splash so it doesn't show twice.
+    if (sessionStorage.getItem('elviraInternalNav') === '1') {
+      sessionStorage.removeItem('elviraInternalNav');
+      document.getElementById('preloader').style.display = 'none';
+    }
+  </script>
+
+  <div id="pageTransition">
+    <div class="pt-loader">
+      <svg fill="none" height="100%" width="100%" viewBox="0 0 300 300" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg"><g id="i0"><g transform="translate(100,156.5)"><animateTransform repeatCount="indefinite" type="translate" attributeName="transform" dur="1.367s" begin="0s" calcMode="spline" values="100 156.5; 104.16 156.5; 108.405 156.5; 112.603 156.5; 116.818 156.5; 121.038 156.5; 125.26 156.5; 129.468 156.5; 133.677 156.5; 137.893 156.5; 142.111 156.5; 146.327 156.5; 150.536 156.5; 154.737 156.5; 158.957 156.5; 163.174 156.5; 167.378 156.5; 171.614 156.5; 175.854 156.5; 180 156.5; 176.231 156.5; 172.445 156.5; 168.618 156.5; 164.801 156.5; 160.99 156.5; 157.174 156.5; 153.353 156.5; 149.529 156.5; 145.721 156.5; 141.91 156.5; 138.093 156.5; 134.281 156.5; 130.472 156.5; 126.649 156.5; 122.83 156.5; 119.018 156.5; 115.213 156.5; 111.408 156.5; 107.587 156.5; 103.743 156.5; 100 156.5; 100 156.5" keyTimes="0; 0.02439; 0.04878; 0.073171; 0.097561; 0.121951; 0.146341; 0.170732; 0.195122; 0.219512; 0.243902; 0.268293; 0.292683; 0.317073; 0.341463; 0.365854; 0.390244; 0.414634; 0.439024; 0.463415; 0.487805; 0.512195; 0.536585; 0.560975; 0.585366; 0.609756; 0.634146; 0.658536; 0.682927; 0.707317; 0.731707; 0.756097; 0.780488; 0.804878; 0.829268; 0.853658; 0.878049; 0.902439; 0.926829; 0.951219; 0.97561; 1" keySplines="0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1" fill="freeze" /><g transform="scale(1,1) translate(0,0)"><g id="i1" transform="matrix(1,0,0,1,4.534,-3.114)"><ellipse ry="20.458" rx="20.458" cy="0" cx="0" stroke-width="0" stroke="#ffffff" fill="#e6e6e6" /></g></g></g></g><g id="i2"><g transform="translate(180,156.5)"><animateTransform repeatCount="indefinite" type="translate" attributeName="transform" dur="1.367s" begin="0s" calcMode="spline" values="180 156.5; 175.84 156.5; 171.595 156.5; 167.397 156.5; 163.182 156.5; 158.962 156.5; 154.74 156.5; 150.532 156.5; 146.323 156.5; 142.107 156.5; 137.889 156.5; 133.673 156.5; 129.464 156.5; 125.263 156.5; 121.043 156.5; 116.826 156.5; 112.622 156.5; 108.386 156.5; 104.146 156.5; 100 156.5; 103.769 156.5; 107.555 156.5; 111.382 156.5; 115.199 156.5; 119.01 156.5; 122.826 156.5; 126.647 156.5; 130.471 156.5; 134.279 156.5; 138.09 156.5; 141.907 156.5; 145.719 156.5; 149.528 156.5; 153.351 156.5; 157.17 156.5; 160.982 156.5; 164.787 156.5; 168.592 156.5; 172.413 156.5; 176.257 156.5; 180 156.5; 180 156.5" keyTimes="0; 0.02439; 0.04878; 0.073171; 0.097561; 0.121951; 0.146341; 0.170732; 0.195122; 0.219512; 0.243902; 0.268293; 0.292683; 0.317073; 0.341463; 0.365854; 0.390244; 0.414634; 0.439024; 0.463415; 0.487805; 0.512195; 0.536585; 0.560975; 0.585366; 0.609756; 0.634146; 0.658536; 0.682927; 0.707317; 0.731707; 0.756097; 0.780488; 0.804878; 0.829268; 0.853658; 0.878049; 0.902439; 0.926829; 0.951219; 0.97561; 1" keySplines="0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1; 0 0 1 1" fill="freeze" /><g transform="scale(1,1) translate(0,0)"><g id="i1" transform="matrix(1,0,0,1,4.534,-3.114)"><ellipse ry="20.458" rx="20.458" cy="0" cx="0" stroke-width="0" stroke="#2d2d2d" fill="#2d2d2d" /></g></g></g></g></svg>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">
+      <img src="https://i.ibb.co/yBG5pb82/image-32.png" alt="Elvira Technologies logo">
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="store.html" class="nav-link">Store</a>
+      <a href="dashboard.html#licenses" class="nav-link">Your Licences</a>
+      <a href="helpcenter.html" class="nav-link">Help Center</a>
+      <a href="/api/auth/discord/login" class="login-btn" id="loginBtn">Log in</a>
+    </nav>
+  </header>
+
+  <section class="search-hero">
+    <h1>What are you looking for?</h1>
+    <p>Enter the name of the product you're looking for or browse the catalog below.</p>
+    <div class="search-box">
+      <input type="text" id="productSearch" placeholder="Search by keyword" autocomplete="off">
+    </div>
+  </section>
+  <div class="search-gradient"></div>
+
+  <section class="search-results" id="searchResults">
+    <p class="search-results__count" id="resultsCount"></p>
+    <div class="products-grid" id="resultsGrid"></div>
+    <p class="no-results" id="noResults" style="display:none;">We're sorry, our system couldn't find any related results.</p>
+  </section>
+
+  <section class="our-products" id="our-products">
+    <h2>Our Products</h2>
+    <p class="our-products__desc">Here you can find all the products available for purchase at Elvire. You can purchase them, view more information, or, if you like a product and want to save it for later, add it to your cart. If you would like to see more detailed information about any of our products, you can do so on our Discord server or by contacting us.</p>
+    <p class="our-products__count" id="productsCount"></p>
+    <div class="products-grid" id="productsGrid"></div>
+    <button class="show-more" id="showMoreBtn">
+      Show More Products
+      <span class="material-symbols-outlined">expand_more</span>
+    </button>
+  </section>
+
+  <section class="discount">
+    <div class="discount__text">
+      <h2>First Purchase, Next Purchase Discount</h2>
+      <p>Make your first purchase at Elvire, and get a discount on most of our products on your next purchase.</p>
+      <a href="#our-products" class="discount__btn" id="startShoppingBtn">Start Shopping</a>
+    </div>
+    <div class="discount__image">
+      <img src="https://i.ibb.co/0ymr7YZ7/S-mbolo-porcentaje-3-D-2d2d2d-PNG-removebg-preview.png" alt="Discount">
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer__brand">
+      <div class="footer__brand-top">
+        <img src="https://i.ibb.co/YTDKf9D7/image.png" alt="Elvira Technologies">
+        <span>Elvira technologies</span>
+      </div>
+      <div class="footer__socials">
+        <a href="https://discord.gg/4bZDmEagpH" target="_blank" rel="noopener">
+          <img src="https://i.ibb.co/v4B5LV3s/image.png" alt="Discord">
+        </a>
+        <a href="https://www.roblox.com/es/communities/32391054/Aena-Group#!/about" target="_blank" rel="noopener">
+          <img src="https://i.ibb.co/0pCpMZkv/image.png" alt="Roblox">
+        </a>
+      </div>
+    </div>
+
+    <div class="footer__links">
+      <h4>Of Interest</h4>
+      <a href="helpcenter.html">Help center</a>
+      <a href="store.html">Products</a>
+      <a href="dashboard.html#licenses">Your Licences</a>
+    </div>
+
+    <div class="footer__payments">
+      <img src="https://i.ibb.co/4ZsXPvNX/image.png" alt="Accepted payment methods">
+    </div>
+  </footer>
+
+  <button id="scrollTop" aria-label="Scroll to top">
+    <span class="material-symbols-outlined">arrow_upward</span>
+  </button>
+
+  <script>
+    /* =========================================================
+       Real catalog, loaded from /api/public/products.
+       ========================================================= */
+    var PRODUCTS = [];
+    var DEFAULT_IMAGE = 'https://i.ibb.co/v4Fk3Cjf/image.png';
+    var CART_ICON = 'https://i.ibb.co/fzsyY50x/image.png';
+    var PAGE_SIZE = 3;
+    var visibleCount = 0;
+
+    function formatEuro(n) {
+      return '€' + (Math.round(n * 100) / 100).toFixed(2);
+    }
+
+    function priceHtml(product) {
+      if (product.price.hasDiscount) {
+        return (
+          '<span style="text-decoration:line-through;color:#828282;font-weight:500;font-size:18px;margin-right:8px;">' +
+          formatEuro(product.price.original) +
+          '</span>' +
+          formatEuro(product.price.final)
+        );
+      }
+      return formatEuro(product.price.original);
+    }
+
+    function createProductCard(product) {
+      var card = document.createElement('div');
+      card.className = 'product-card';
+      var labelHtml = product.label
+        ? '<span class="product-card__label">' + product.label + '</span>'
+        : '';
+      var badgeHtml = product.price.hasDiscount
+        ? '<span class="product-card__badge">' + product.price.badge + '</span>'
+        : '';
+      card.innerHTML =
+        '<div class="product-card__media">' +
+        '<img class="product-card__img" src="' + (product.image || DEFAULT_IMAGE) + '" alt="' + product.name + '">' +
+        labelHtml + badgeHtml +
+        '</div>' +
+        '<h3 class="product-card__title">' + product.name + '</h3>' +
+        '<p class="product-card__price">' + priceHtml(product) + '</p>' +
+        '<div class="product-card__actions">' +
+        '<a href="product.html?id=' + encodeURIComponent(product.id) + '" class="btn-view">View Product</a>' +
+        '<button class="btn-cart" type="button" aria-label="Add to cart" data-id="' + product.id + '">' +
+        '<img src="' + CART_ICON + '" alt="">' +
+        '</button>' +
+        '</div>';
+      return card;
+    }
+
+    function attachCartHandlers(container) {
+      container.querySelectorAll('.btn-cart').forEach(function (btn) {
+        if (btn.dataset.bound === '1') return;
+        btn.dataset.bound = '1';
+        if (window.ElviraCart && window.ElviraCart.has(btn.dataset.id)) btn.classList.add('added');
+        btn.addEventListener('click', function () {
+          if (window.ElviraCart) window.ElviraCart.add(btn.dataset.id);
+          btn.classList.add('added');
+        });
+      });
+    }
+
+    /* ---------- Our Products: paginated grid ---------- */
+    var productsGrid = document.getElementById('productsGrid');
+    var productsCount = document.getElementById('productsCount');
+    var showMoreBtn = document.getElementById('showMoreBtn');
+
+    function renderNextPage() {
+      var next = PRODUCTS.slice(visibleCount, visibleCount + PAGE_SIZE);
+      next.forEach(function (product) {
+        productsGrid.appendChild(createProductCard(product));
+      });
+      attachCartHandlers(productsGrid);
+      visibleCount += next.length;
+      productsCount.textContent = PRODUCTS.length
+        ? 'Showing ' + visibleCount + ' of ' + PRODUCTS.length + ' products'
+        : 'No products are available yet.';
+      if (visibleCount >= PRODUCTS.length) {
+        showMoreBtn.classList.add('hidden');
+      }
+    }
+
+    /* ---------- Keyword search ---------- */
+    var searchInput = document.getElementById('productSearch');
+    var searchResults = document.getElementById('searchResults');
+    var resultsCount = document.getElementById('resultsCount');
+    var resultsGrid = document.getElementById('resultsGrid');
+    var noResults = document.getElementById('noResults');
+
+    function runSearch(query) {
+      var q = query.trim().toLowerCase();
+      if (!q) {
+        searchResults.classList.remove('visible');
+        return;
+      }
+      var matches = PRODUCTS.filter(function (product) {
+        var haystack = (product.name + ' ' + product.category + ' ' + product.summary).toLowerCase();
+        return haystack.indexOf(q) !== -1;
+      });
+
+      resultsGrid.innerHTML = '';
+      if (matches.length === 0) {
+        noResults.style.display = 'block';
+        resultsCount.textContent = 'Showing 0 of ' + PRODUCTS.length + ' results for \u2018' + query.trim() + '\u2019';
+      } else {
+        noResults.style.display = 'none';
+        matches.forEach(function (product) {
+          resultsGrid.appendChild(createProductCard(product));
+        });
+        attachCartHandlers(resultsGrid);
+        resultsCount.textContent = 'Showing ' + matches.length + ' of ' + PRODUCTS.length + ' results for \u2018' + query.trim() + '\u2019';
+      }
+      searchResults.classList.add('visible');
+    }
+
+    searchInput.addEventListener('input', function (e) {
+      runSearch(e.target.value);
+    });
+
+    fetch('/api/public/products')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        PRODUCTS = data.products || [];
+        renderNextPage();
+      })
+      .catch(function () {
+        productsCount.textContent = 'Could not load the products right now.';
+      });
+
+    showMoreBtn.addEventListener('click', renderNextPage);
+
+    /* ---------- Preloader ---------- */
+    var preloader = document.getElementById('preloader');
+    var slowMsg = document.getElementById('slowMsg');
+    var pageStart = Date.now();
+
+    function hidePreloader() {
+      preloader.classList.add('hidden');
+      setTimeout(function () { preloader.style.display = 'none'; }, 300);
+    }
+
+    window.addEventListener('load', function () {
+      var elapsed = Date.now() - pageStart;
+      var remaining = Math.max(3000 - elapsed, 0);
+      setTimeout(hidePreloader, remaining);
+    });
+
+    setTimeout(function () {
+      if (!preloader.classList.contains('hidden')) {
+        slowMsg.classList.add('visible');
+      }
+    }, 7000);
+
+    /* ---------- Mobile nav toggle ---------- */
+    var navToggle = document.getElementById('navToggle');
+    var mainNav = document.getElementById('mainNav');
+    navToggle.addEventListener('click', function () {
+      mainNav.classList.toggle('open');
+      navToggle.classList.toggle('open');
+    });
+
+    /* ---------- Scroll to top ---------- */
+    var scrollBtn = document.getElementById('scrollTop');
+    window.addEventListener('scroll', function () {
+      if (window.scrollY > 400) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+    scrollBtn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* ---------- Page transition ---------- */
+    var pageTransition = document.getElementById('pageTransition');
+    document.querySelectorAll('a[href]').forEach(function (link) {
+      var href = link.getAttribute('href');
+      if (!href || href.startsWith('#') || link.target === '_blank' || /^https?:\/\//i.test(href)) {
+        return;
+      }
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        pageTransition.classList.add('visible');
+        sessionStorage.setItem('elviraInternalNav', '1');
+        setTimeout(function () { window.location.href = href; }, 450);
+      });
+    });
+  </script>
+
+  <script src="assets/js/elvira-auth.js"></script>
+  <script src="assets/js/elvira-cart.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product editor - Elvira Technologies</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/1JGJ5f6C/image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+<style>
+  :root{ --dark:#2D2D2D; --light-bg:#F7F7F7; --muted:#828282; --radius:8px; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter', sans-serif;color:#000;background:#fff;padding-top:146px;-webkit-font-smoothing:antialiased;}
+  img{display:block;max-width:100%;}
+  a{color:inherit;}
+
+  #preloader{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .3s ease;}
+  #preloader img{width:78px;opacity:0;transform:scale(.9);animation:logoIn .7s ease forwards;}
+  @keyframes logoIn{to{opacity:1;transform:scale(1);}}
+  #preloader.hidden{opacity:0;pointer-events:none;}
+
+  header.site-header{width:100%;height:146px;background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 56px;position:fixed;top:0;left:0;z-index:20;}
+  .site-header .logo img{height:44px;width:auto;}
+  nav.main-nav{display:flex;align-items:center;gap:36px;}
+  nav.main-nav a.nav-link{color:#fff;font-size:20px;font-weight:500;text-decoration:none;}
+  a.login-btn{background:#fff;color:#000;font-size:16px;padding:10px 22px;border-radius:var(--radius);text-decoration:none;}
+  .nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;}
+  .nav-toggle span{width:26px;height:2px;background:#fff;display:block;}
+  @media (max-width:768px){
+    .nav-toggle{display:flex;}
+    nav.main-nav{position:absolute;top:88px;left:0;width:100%;background:var(--dark);flex-direction:column;align-items:flex-start;gap:0;max-height:0;padding:0 20px;overflow:hidden;transition:max-height .35s ease, padding .35s ease;}
+    nav.main-nav.open{max-height:400px;padding:12px 20px 20px;}
+    nav.main-nav a.nav-link{padding:12px 0;width:100%;}
+    a.login-btn{margin:12px 0 0;}
+    .user-menu{margin:12px 0 0;width:100%;}
+    .user-menu__trigger{width:100%;justify-content:space-between;}
+    .user-menu__dropdown{position:static;box-shadow:none;border:1px solid #eee;margin-top:8px;opacity:1;pointer-events:auto;transform:none;display:none;padding:8px;}
+    .user-menu__dropdown.open{display:block;}
+  }
+  .user-menu{position:relative;margin-left:8px;}
+  .user-menu__trigger{display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;padding:6px 10px;border-radius:999px;}
+  .user-menu__avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#828282;}
+  .user-menu__name{color:#fff;font-size:16px;font-weight:500;}
+  .user-menu__chevron{color:#fff;font-size:20px;}
+  .user-menu__dropdown{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:200px;padding:8px;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .2s ease, transform .2s ease;}
+  .user-menu__dropdown.open{opacity:1;pointer-events:auto;transform:translateY(0);}
+  .user-menu__dropdown a,.user-menu__dropdown button{display:block;width:100%;text-align:left;background:none;border:none;font-size:15px;font-weight:500;color:#000;text-decoration:none;padding:10px 12px;border-radius:6px;cursor:pointer;}
+  .user-menu__dropdown a:hover,.user-menu__dropdown button:hover{background:#F7F7F7;}
+
+  .editor-wrap{max-width:900px;margin:0 auto;padding:56px 24px 96px;}
+  .editor-wrap h1{font-size:36px;font-weight:600;margin-bottom:8px;}
+  .editor-wrap__sub{color:var(--muted);font-size:16px;margin-bottom:32px;}
+
+  .field{margin-bottom:26px;}
+  .field label{display:block;font-size:15px;font-weight:600;margin-bottom:8px;}
+  .field .hint{font-size:13px;color:var(--muted);margin-top:6px;}
+  input[type="text"],input[type="number"],input[type="url"],select,textarea{
+    width:100%;font-family:'Inter', sans-serif;font-size:15px;color:#000;background:#fff;
+    border:1px solid #D9D9D9;border-radius:var(--radius);padding:12px 14px;outline:none;
+  }
+  input:focus,select:focus,textarea:focus{border-color:#2D2D2D;}
+  .field-row{display:flex;gap:16px;}
+  .field-row .field{flex:1;}
+
+  .rte-toolbar{display:flex;gap:4px;border:1px solid #D9D9D9;border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;padding:8px;background:#FAFAFA;flex-wrap:wrap;}
+  .rte-toolbar button{background:#fff;border:1px solid #D9D9D9;border-radius:6px;width:34px;height:34px;cursor:pointer;font-family:'Inter', sans-serif;font-weight:600;}
+  .rte-toolbar input[type="color"]{width:34px;height:34px;border:1px solid #D9D9D9;border-radius:6px;padding:2px;cursor:pointer;}
+  .rte-box{border:1px solid #D9D9D9;border-radius:0 0 var(--radius) var(--radius);min-height:160px;padding:14px;font-size:15px;line-height:1.5;outline:none;}
+  .rte-box:focus{border-color:#2D2D2D;}
+
+  .media-list,.file-list{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;}
+  .media-item{position:relative;width:110px;height:110px;border-radius:8px;overflow:hidden;background:var(--light-bg);border:1px solid #D9D9D9;}
+  .media-item img,.media-item video{width:100%;height:100%;object-fit:cover;}
+  .media-item__remove{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:13px;line-height:1;}
+  .file-chip{display:flex;align-items:center;gap:10px;background:var(--light-bg);border:1px solid #D9D9D9;border-radius:8px;padding:8px 12px;font-size:13px;}
+  .file-chip button{background:none;border:none;color:#c0392b;cursor:pointer;font-size:13px;}
+
+  .upload-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn-mini{font-family:'Inter', sans-serif;font-size:14px;font-weight:500;background:#2D2D2D;color:#fff;border:none;border-radius:var(--radius);padding:9px 16px;cursor:pointer;}
+  .btn-mini.secondary{background:#fff;color:#000;border:1px solid #D9D9D9;}
+  .btn-mini:disabled{opacity:.5;cursor:default;}
+
+  .price-final{margin-top:10px;font-size:14px;color:#2D2D2D;font-weight:600;}
+
+  .radio-group{display:flex;gap:18px;flex-wrap:wrap;}
+  .radio-group label{display:flex;align-items:center;gap:8px;font-weight:400;font-size:15px;}
+
+  .form-error{color:#c0392b;font-size:14px;margin-bottom:18px;display:none;}
+  .form-actions{display:flex;gap:12px;margin-top:12px;}
+  .btn-save{background:#000;color:#fff;border:none;border-radius:var(--radius);padding:14px 30px;font-size:16px;font-weight:500;cursor:pointer;}
+  .btn-save:disabled{opacity:.6;cursor:default;}
+  .btn-cancel{background:#fff;color:#000;border:1px solid #D9D9D9;border-radius:var(--radius);padding:14px 30px;font-size:16px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;}
+
+  @media (max-width:768px){
+    body{padding-top:88px;}
+    header.site-header{padding:0 20px;height:88px;}
+    .site-header .logo img{height:34px;}
+    .field-row{flex-direction:column;}
+    .editor-wrap{padding:32px 18px 64px;}
+    .editor-wrap h1{font-size:26px;}
+  }
+</style>
+</head>
+<body>
+
+  <div id="preloader"><img src="https://i.ibb.co/YTDKf9D7/image.png" alt="Elvira Technologies"></div>
+
+  <header class="site-header">
+    <a href="index.html" class="logo"><img src="https://i.ibb.co/yBG5pb82/image-32.png" alt="Elvira Technologies logo"></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="store.html" class="nav-link">Store</a>
+      <a href="managementarea.html" class="nav-link">Management Area</a>
+      <a href="/api/auth/discord/login" class="login-btn" id="loginBtn">Log in</a>
+    </nav>
+  </header>
+
+  <main class="editor-wrap">
+    <h1 id="pageTitle">Add new product</h1>
+    <p class="editor-wrap__sub">Fill in the details below, then save and publish.</p>
+    <div class="form-error" id="formError"></div>
+
+    <div class="field">
+      <label for="fName">1. Product name</label>
+      <input type="text" id="fName" maxlength="120">
+    </div>
+
+    <div class="field">
+      <label>2. Images / videos</label>
+      <div class="upload-row">
+        <input type="file" id="mediaFileInput" accept="image/*,video/*" multiple style="display:none;">
+        <button type="button" class="btn-mini" id="mediaUploadBtn">Upload from computer</button>
+        <input type="url" id="mediaLinkInput" placeholder="Or paste an image/video link" style="flex:1;min-width:200px;">
+        <select id="mediaLinkType"><option value="image">Image</option><option value="video">Video</option></select>
+        <button type="button" class="btn-mini secondary" id="mediaLinkAddBtn">Add link</button>
+      </div>
+      <div class="media-list" id="mediaList"></div>
+      <p class="hint" id="mediaStatus"></p>
+    </div>
+
+    <div class="field">
+      <label>3. Description</label>
+      <div class="rte-toolbar" data-target="descriptionEditor">
+        <button type="button" data-cmd="bold"><b>B</b></button>
+        <button type="button" data-cmd="italic"><i>I</i></button>
+        <button type="button" data-cmd="underline"><u>U</u></button>
+        <button type="button" data-cmd="insertUnorderedList">•≡</button>
+        <input type="color" data-cmd="foreColor" value="#000000">
+      </div>
+      <div class="rte-box" id="descriptionEditor" contenteditable="true"></div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="fCategory">4. Category</label>
+        <input type="text" id="fCategory" maxlength="60" placeholder="e.g. Aircraft, Scripts, Maps">
+      </div>
+      <div class="field">
+        <label for="fLabel">11. Label (optional)</label>
+        <input type="text" id="fLabel" maxlength="30" placeholder="e.g. New, Best seller">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="fExtra">5. Additional details text (optional)</label>
+      <textarea id="fExtra" rows="4" maxlength="2000"></textarea>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="fPrice">6. Price (€)</label>
+        <input type="number" id="fPrice" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label for="fDiscountType">7. Discount (optional)</label>
+        <select id="fDiscountType">
+          <option value="none">No discount</option>
+          <option value="percent">Percentage (%)</option>
+          <option value="amount">Fixed amount (€)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fDiscountValue">&nbsp;</label>
+        <input type="number" id="fDiscountValue" min="0" step="0.01" placeholder="Amount">
+      </div>
+    </div>
+    <p class="price-final" id="priceFinalText"></p>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="fPriceRobux">8. Price in Robux (optional)</label>
+        <input type="number" id="fPriceRobux" min="0" step="1">
+      </div>
+      <div class="field">
+        <label for="fDiscountRobuxType">9. Robux discount (optional)</label>
+        <select id="fDiscountRobuxType">
+          <option value="none">No discount</option>
+          <option value="percent">Percentage (%)</option>
+          <option value="amount">Fixed amount (Robux)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fDiscountRobuxValue">&nbsp;</label>
+        <input type="number" id="fDiscountRobuxValue" min="0" step="1" placeholder="Amount">
+      </div>
+    </div>
+    <p class="price-final" id="robuxFinalText"></p>
+    <p class="hint">Robux pricing isn't shown anywhere on the site yet — it's saved for future use.</p>
+
+    <div class="field">
+      <label>10. Files the customer receives</label>
+      <div class="upload-row">
+        <input type="file" id="fileInput" multiple style="display:none;">
+        <button type="button" class="btn-mini" id="fileUploadBtn">Upload files</button>
+      </div>
+      <div class="file-list" id="fileList"></div>
+      <p class="hint" id="fileStatus"></p>
+      <div class="field" style="margin-top:14px;">
+        <label for="fDeliveryLink">Or a link to open when the license is redeemed (optional)</label>
+        <input type="url" id="fDeliveryLink" placeholder="https://...">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>12. Status</label>
+      <div class="radio-group">
+        <label><input type="radio" name="fStatus" value="private"> Private</label>
+        <label><input type="radio" name="fStatus" value="public" checked> Public</label>
+        <label><input type="radio" name="fStatus" value="unlisted"> Only users with the link</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>13. Instructions after purchase</label>
+      <div class="rte-toolbar" data-target="instructionsEditor">
+        <button type="button" data-cmd="bold"><b>B</b></button>
+        <button type="button" data-cmd="italic"><i>I</i></button>
+        <button type="button" data-cmd="underline"><u>U</u></button>
+        <button type="button" data-cmd="insertUnorderedList">•≡</button>
+        <input type="color" data-cmd="foreColor" value="#000000">
+      </div>
+      <div class="rte-box" id="instructionsEditor" contenteditable="true"></div>
+    </div>
+
+    <div class="form-actions">
+      <a href="managementarea.html" class="btn-cancel">Cancel</a>
+      <button type="button" class="btn-save" id="saveBtn">Save and publish product</button>
+    </div>
+  </main>
+
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var productId = params.get('id') || '';
+    var media = []; // { type, source: 'upload'|'link', path?, url }
+    var deliverables = []; // { name, path, size }
+
+    function flatApi(u){var m=/^(\/api\/[^\/?#]+\/[^\/?#]+)(\/[^?#]*)?(\?[^#]*)?$/.exec(u);if(!m||!m[2])return u;return m[1]+'?_p='+encodeURIComponent(m[2].replace(/^\//,''))+(m[3]?'&'+m[3].slice(1):'');}
+    function apiFetch(url, opts) {
+      opts = opts || {};
+      opts.credentials = 'same-origin';
+      opts.headers = Object.assign({ 'X-Requested-With': 'elvira-admin' }, opts.headers || {});
+      if (opts.body && typeof opts.body !== 'string') {
+        opts.body = JSON.stringify(opts.body);
+        opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+      }
+      return fetch(flatApi(url), opts).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (data) {
+          if (!r.ok) throw new Error(data.error || 'Something went wrong.');
+          return data;
+        });
+      });
+    }
+
+    /* ---------- Rich text toolbars ---------- */
+    document.querySelectorAll('.rte-toolbar').forEach(function (toolbar) {
+      var target = document.getElementById(toolbar.dataset.target);
+      toolbar.querySelectorAll('[data-cmd]').forEach(function (control) {
+        var cmd = control.dataset.cmd;
+        if (control.tagName === 'INPUT') {
+          control.addEventListener('input', function () {
+            target.focus();
+            document.execCommand(cmd, false, control.value);
+          });
+        } else {
+          control.addEventListener('click', function () {
+            target.focus();
+            document.execCommand(cmd, false, null);
+          });
+        }
+      });
+    });
+
+    /* ---------- Media ---------- */
+    function renderMedia() {
+      document.getElementById('mediaList').innerHTML = media.map(function (m, i) {
+        var preview = m.type === 'video'
+          ? '<video src="' + m.url + '" muted></video>'
+          : '<img src="' + m.url + '" alt="">';
+        return '<div class="media-item" data-i="' + i + '">' + preview + '<button type="button" class="media-item__remove" data-remove="' + i + '">✕</button></div>';
+      }).join('');
+    }
+    document.getElementById('mediaList').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-remove]');
+      if (!btn) return;
+      media.splice(Number(btn.dataset.remove), 1);
+      renderMedia();
+    });
+
+    function uploadToStorage(bucket, file) {
+      return apiFetch('/api/admin/upload-url', { method: 'POST', body: { bucket: bucket, filename: file.name, contentType: file.type || 'application/octet-stream' } })
+        .then(function (data) {
+          return fetch(data.signedUrl, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file })
+            .then(function (r) {
+              if (!r.ok) throw new Error('Upload failed for ' + file.name);
+              return data.path;
+            });
+        });
+    }
+
+    document.getElementById('mediaUploadBtn').addEventListener('click', function () { document.getElementById('mediaFileInput').click(); });
+    document.getElementById('mediaFileInput').addEventListener('change', function (e) {
+      var files = Array.prototype.slice.call(e.target.files);
+      if (!files.length) return;
+      var status = document.getElementById('mediaStatus');
+      status.textContent = 'Uploading…';
+      Promise.all(files.map(function (file) {
+        var type = file.type.indexOf('video') === 0 ? 'video' : 'image';
+        var localUrl = URL.createObjectURL(file);
+        return uploadToStorage('media', file).then(function (path) {
+          media.push({ type: type, source: 'upload', path: path, url: localUrl });
+        });
+      })).then(function () {
+        status.textContent = '';
+        renderMedia();
+      }).catch(function (err) {
+        status.textContent = err.message;
+      });
+      e.target.value = '';
+    });
+
+    document.getElementById('mediaLinkAddBtn').addEventListener('click', function () {
+      var url = document.getElementById('mediaLinkInput').value.trim();
+      if (!/^https?:\/\//i.test(url)) { document.getElementById('mediaStatus').textContent = 'Enter a valid http(s) link.'; return; }
+      media.push({ type: document.getElementById('mediaLinkType').value, source: 'link', url: url });
+      document.getElementById('mediaLinkInput').value = '';
+      document.getElementById('mediaStatus').textContent = '';
+      renderMedia();
+    });
+
+    /* ---------- Files ---------- */
+    function renderFiles() {
+      document.getElementById('fileList').innerHTML = deliverables.map(function (f, i) {
+        return '<div class="file-chip">' + f.name + ' <button type="button" data-remove="' + i + '">✕</button></div>';
+      }).join('');
+    }
+    document.getElementById('fileList').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-remove]');
+      if (!btn) return;
+      deliverables.splice(Number(btn.dataset.remove), 1);
+      renderFiles();
+    });
+    document.getElementById('fileUploadBtn').addEventListener('click', function () { document.getElementById('fileInput').click(); });
+    document.getElementById('fileInput').addEventListener('change', function (e) {
+      var files = Array.prototype.slice.call(e.target.files);
+      if (!files.length) return;
+      var status = document.getElementById('fileStatus');
+      status.textContent = 'Uploading…';
+      Promise.all(files.map(function (file) {
+        return uploadToStorage('files', file).then(function (path) {
+          deliverables.push({ name: file.name, path: path, size: file.size });
+        });
+      })).then(function () {
+        status.textContent = '';
+        renderFiles();
+      }).catch(function (err) {
+        status.textContent = err.message;
+      });
+      e.target.value = '';
+    });
+
+    /* ---------- Price preview ---------- */
+    function euro(n) { return '€' + (Math.round(n * 100) / 100).toFixed(2); }
+    function updatePricePreview() {
+      var price = parseFloat(document.getElementById('fPrice').value) || 0;
+      var type = document.getElementById('fDiscountType').value;
+      var value = parseFloat(document.getElementById('fDiscountValue').value) || 0;
+      var final = price;
+      if (type === 'percent') final = price * (1 - Math.min(value, 100) / 100);
+      else if (type === 'amount') final = price - value;
+      final = Math.max(0, Math.round(final * 100) / 100);
+      document.getElementById('priceFinalText').textContent = type === 'none' ? '' : 'Final price with discount: ' + euro(final);
+
+      var robux = parseFloat(document.getElementById('fPriceRobux').value) || 0;
+      var rtype = document.getElementById('fDiscountRobuxType').value;
+      var rvalue = parseFloat(document.getElementById('fDiscountRobuxValue').value) || 0;
+      var rfinal = robux;
+      if (rtype === 'percent') rfinal = robux * (1 - Math.min(rvalue, 100) / 100);
+      else if (rtype === 'amount') rfinal = robux - rvalue;
+      rfinal = Math.max(0, Math.round(rfinal));
+      document.getElementById('robuxFinalText').textContent = rtype === 'none' || !robux ? '' : 'Final Robux price with discount: ' + rfinal + ' Robux';
+    }
+    ['fPrice', 'fDiscountType', 'fDiscountValue', 'fPriceRobux', 'fDiscountRobuxType', 'fDiscountRobuxValue'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', updatePricePreview);
+    });
+
+    /* ---------- Load existing product (edit mode) ---------- */
+    if (productId) {
+      document.getElementById('pageTitle').textContent = 'Edit product';
+      apiFetch('/api/admin/products/' + productId).then(function (data) {
+        var p = data.product;
+        document.getElementById('fName').value = p.name;
+        media = (p.media || []).slice();
+        renderMedia();
+        document.getElementById('descriptionEditor').innerHTML = p.descriptionHtml || '';
+        document.getElementById('fCategory').value = p.category || '';
+        document.getElementById('fLabel').value = p.label || '';
+        document.getElementById('fExtra').value = p.extraDetails || '';
+        document.getElementById('fPrice').value = p.priceEur;
+        document.getElementById('fDiscountType').value = p.discountType;
+        document.getElementById('fDiscountValue').value = p.discountValue || '';
+        document.getElementById('fPriceRobux').value = p.priceRobux == null ? '' : p.priceRobux;
+        document.getElementById('fDiscountRobuxType').value = p.discountRobuxType;
+        document.getElementById('fDiscountRobuxValue').value = p.discountRobuxValue || '';
+        deliverables = (p.deliverables || []).slice();
+        renderFiles();
+        document.getElementById('fDeliveryLink').value = p.deliveryLink || '';
+        document.querySelector('input[name="fStatus"][value="' + p.status + '"]').checked = true;
+        document.getElementById('instructionsEditor').innerHTML = p.instructionsHtml || '';
+        updatePricePreview();
+      }).catch(function (err) {
+        document.getElementById('formError').textContent = err.message;
+        document.getElementById('formError').style.display = 'block';
+      });
+    }
+
+    /* ---------- Save ---------- */
+    document.getElementById('saveBtn').addEventListener('click', function () {
+      var errorBox = document.getElementById('formError');
+      errorBox.style.display = 'none';
+
+      var body = {
+        name: document.getElementById('fName').value,
+        media: media.map(function (m) { return m.source === 'upload' ? { type: m.type, source: 'upload', path: m.path } : { type: m.type, source: 'link', url: m.url }; }),
+        descriptionHtml: document.getElementById('descriptionEditor').innerHTML,
+        category: document.getElementById('fCategory').value,
+        extraDetails: document.getElementById('fExtra').value,
+        priceEur: parseFloat(document.getElementById('fPrice').value),
+        discountType: document.getElementById('fDiscountType').value,
+        discountValue: parseFloat(document.getElementById('fDiscountValue').value) || 0,
+        priceRobux: document.getElementById('fPriceRobux').value === '' ? null : parseInt(document.getElementById('fPriceRobux').value, 10),
+        discountRobuxType: document.getElementById('fDiscountRobuxType').value,
+        discountRobuxValue: parseFloat(document.getElementById('fDiscountRobuxValue').value) || 0,
+        deliverables: deliverables,
+        deliveryLink: document.getElementById('fDeliveryLink').value,
+        label: document.getElementById('fLabel').value,
+        status: document.querySelector('input[name="fStatus"]:checked').value,
+        instructionsHtml: document.getElementById('instructionsEditor').innerHTML
+      };
+
+      var saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+
+      var req = productId
+        ? apiFetch('/api/admin/products/' + productId, { method: 'PUT', body: body })
+        : apiFetch('/api/admin/products', { method: 'POST', body: body });
+
+      req.then(function () {
+        window.location.href = 'managementarea.html';
+      }).catch(function (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save and publish product';
+      });
+    });
+
+    /* ---------- Preloader / nav / session ---------- */
+    window.addEventListener('load', function () {
+      var preloader = document.getElementById('preloader');
+      setTimeout(function () {
+        preloader.classList.add('hidden');
+        setTimeout(function () { preloader.style.display = 'none'; }, 300);
+      }, 400);
+    });
+    document.getElementById('navToggle').addEventListener('click', function () {
+      document.getElementById('mainNav').classList.toggle('open');
+    });
+
+    document.addEventListener('elvira:session', function (e) {
+      if (!e.detail.loggedIn || e.detail.role !== 'admin') {
+        window.location.href = 'managementarea.html';
+      }
+    });
+  </script>
+
+  <script src="assets/js/elvira-auth.js"></script>
+
+</body>
+</html>

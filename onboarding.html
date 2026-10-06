@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify your Roblox account - Elvira Technologies</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/1JGJ5f6C/image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --dark:#2D2D2D;
+    --radius:8px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter', sans-serif;
+    color:#fff;
+    background:var(--dark);
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    padding-top:146px;
+  }
+  img{display:block;max-width:100%;}
+  a{color:inherit;}
+
+  header.site-header{
+    width:100%;
+    height:146px;
+    background:var(--dark);
+    display:flex;
+    align-items:center;
+    padding:0 56px;
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:20;
+  }
+  .site-header .logo img{height:44px;width:auto;}
+
+  .onboarding{
+    max-width:680px;
+    margin:0 auto;
+    padding:72px 24px 96px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .onboarding h1{
+    font-size:56px;
+    font-weight:700;
+    color:#fff;
+    line-height:1.1;
+  }
+  .onboarding__welcome{
+    font-size:24px;
+    font-weight:400;
+    color:#fff;
+    margin-top:16px;
+  }
+  .onboarding__desc{
+    font-size:18px;
+    font-weight:400;
+    color:#D9D9D9;
+    margin-top:22px;
+    line-height:1.6;
+    max-width:600px;
+  }
+
+  .code-card{
+    margin-top:40px;
+    width:100%;
+    max-width:400px;
+    background:#242424;
+    border:1px solid #3d3d3d;
+    border-radius:12px;
+    padding:32px;
+  }
+  .code-card__label{
+    font-size:13px;
+    font-weight:500;
+    color:#828282;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .code-card__code{
+    font-size:56px;
+    font-weight:700;
+    letter-spacing:.12em;
+    color:#fff;
+    margin-top:10px;
+    font-variant-numeric:tabular-nums;
+  }
+  .code-card__timer{
+    font-size:15px;
+    font-weight:500;
+    color:#D9D9D9;
+    margin-top:16px;
+  }
+  .code-card__timer span{color:#fff;font-weight:700;}
+
+  .play-btn{
+    margin-top:28px;
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    background:#fff;
+    color:#000;
+    text-decoration:none;
+    font-family:'Inter', sans-serif;
+    font-size:18px;
+    font-weight:600;
+    padding:16px 32px;
+    border-radius:var(--radius);
+    transition:opacity .2s ease;
+  }
+  .play-btn:hover{opacity:.85;}
+  .play-btn img{width:26px;height:26px;}
+
+  .onboarding__result{
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    margin-top:24px;
+  }
+  .onboarding__result.visible{display:flex;}
+  .result-lottie{width:220px;height:220px;border:none;}
+  .result-title{
+    font-size:28px;
+    font-weight:600;
+    color:#fff;
+    margin-top:8px;
+  }
+  .result-redirect-note{
+    font-size:15px;
+    font-weight:400;
+    color:#D9D9D9;
+    margin-top:14px;
+  }
+
+  @media (max-width:768px){
+    body{padding-top:88px;}
+    header.site-header{padding:0 24px;height:88px;}
+    .site-header .logo img{height:34px;}
+
+    .onboarding{padding:48px 20px 72px;}
+    .onboarding h1{font-size:32px;}
+    .onboarding__welcome{font-size:18px;}
+    .onboarding__desc{font-size:16px;}
+
+    .code-card{padding:24px;}
+    .code-card__code{font-size:42px;}
+
+    .play-btn{width:100%;justify-content:center;font-size:16px;padding:15px 20px;}
+    .result-lottie{width:160px;height:160px;}
+  }
+</style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">
+      <img src="https://i.ibb.co/yBG5pb82/image-32.png" alt="Elvira Technologies logo">
+    </a>
+  </header>
+
+  <main class="onboarding">
+    <h1>Verify your Roblox account</h1>
+    <p class="onboarding__welcome" id="welcomeText">Welcome back, username. Manage your account, purchases, and licenses in one place.</p>
+    <p class="onboarding__desc" id="instructions">
+      To continue we need to verify your Roblox account, so it's linked to your product licenses.
+      Join our verification game on Roblox with the button below, then enter the code shown here
+      inside the game. Once it matches, this page will update automatically and take you to your dashboard.
+    </p>
+
+    <div class="code-card" id="codeCard">
+      <div class="code-card__label">Your verification code</div>
+      <div class="code-card__code" id="codeDisplay">------</div>
+      <div class="code-card__timer">Refreshes in <span id="codeTimer">5:00</span></div>
+    </div>
+
+    <a href="https://www.roblox.com/es/games/93405228411134/elvira-verification-center" target="_blank" rel="noopener" class="play-btn" id="playBtn">
+      <img src="https://i.ibb.co/0pCpMZkv/image.png" alt="">
+      Open the verification game
+    </a>
+
+    <div class="onboarding__result" id="successState">
+      <iframe class="result-lottie" src="https://lottie.host/embed/054edbed-ed57-414c-89fe-63b59d046fed/2UTX1p8WfD.lottie" title="Verification successful"></iframe>
+      <p class="result-title">Your Roblox account has been linked successfully!</p>
+      <p class="result-redirect-note">Taking you to your dashboard…</p>
+    </div>
+  </main>
+
+  <script>
+    var codeDisplay = document.getElementById('codeDisplay');
+    var codeTimer = document.getElementById('codeTimer');
+    var codeCard = document.getElementById('codeCard');
+    var playBtn = document.getElementById('playBtn');
+    var instructions = document.getElementById('instructions');
+    var successState = document.getElementById('successState');
+
+    var expiresAt = null;
+    var countdownInterval = null;
+    var pollInterval = null;
+    var verified = false;
+
+    function formatTime(ms) {
+      var totalSeconds = Math.max(Math.round(ms / 1000), 0);
+      var minutes = Math.floor(totalSeconds / 60);
+      var seconds = totalSeconds % 60;
+      return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+    }
+
+    function fetchNewCode() {
+      fetch('/api/roblox/code?_p=generate', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data.code) return;
+          codeDisplay.textContent = data.code.slice(0, 3) + ' ' + data.code.slice(3);
+          expiresAt = new Date(data.expiresAt).getTime();
+        })
+        .catch(function () {
+          codeDisplay.textContent = 'Error';
+        });
+    }
+
+    function tickCountdown() {
+      if (verified || !expiresAt) return;
+      var remaining = expiresAt - Date.now();
+      if (remaining <= 0) {
+        fetchNewCode();
+        return;
+      }
+      codeTimer.textContent = formatTime(remaining);
+    }
+
+    function showSuccess() {
+      verified = true;
+      clearInterval(countdownInterval);
+      clearInterval(pollInterval);
+      codeCard.style.display = 'none';
+      playBtn.style.display = 'none';
+      instructions.style.display = 'none';
+      successState.classList.add('visible');
+      setTimeout(function () {
+        // If the visitor was in the middle of a payment or download, send them back to it.
+        fetch('/api/auth/next', { credentials: 'same-origin' })
+          .then(function (r) { return r.json(); })
+          .then(function (d) { window.location.href = (d && d.next) ? d.next : 'dashboard.html'; })
+          .catch(function () { window.location.href = 'dashboard.html'; });
+      }, 3000);
+    }
+
+    function pollSession() {
+      fetch('/api/session', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (session) {
+          if (!session.loggedIn) {
+            window.location.href = 'index.html';
+            return;
+          }
+          document.getElementById('welcomeText').textContent =
+            'Welcome back, ' + session.discordUsername + '. Manage your account, purchases, and licenses in one place.';
+
+          if (session.robloxVerified) {
+            showSuccess();
+          }
+        })
+        .catch(function () {
+          // Backend not reachable yet — keep the static page visible.
+        });
+    }
+
+    pollSession();
+    fetchNewCode();
+    countdownInterval = setInterval(tickCountdown, 1000);
+    pollInterval = setInterval(pollSession, 3000);
+  </script>
+
+</body>
+</html>

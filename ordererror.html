@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Order not completed - Elvira Technologies</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/1JGJ5f6C/image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/elvira-shell.css">
+<style>
+  main.done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:48px 24px 72px;}
+  .done__anim{width:240px;height:240px;border:0;background:transparent;overflow:hidden;}
+  .done h1{font-size:40px;font-weight:700;margin-top:8px;}
+  .done p{max-width:660px;margin-top:16px;font-size:18px;line-height:1.6;color:#2d2d2d;}
+  .done .btn{margin-top:30px;background:#000;color:#fff;text-decoration:none;border-radius:8px;padding:16px 32px;font:500 18px Inter,sans-serif;}
+  .spinner{width:34px;height:34px;border:3px solid #e6e6e6;border-top-color:#000;border-radius:50%;animation:spin .8s linear infinite;margin:60px auto 0;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(max-width:768px){.done h1{font-size:28px}.done p{font-size:16px}.done__anim{width:200px;height:200px}}
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" class="logo"><img src="https://i.ibb.co/yBG5pb82/image-32.png" alt="Elvira Technologies logo"></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="store.html" class="nav-link">Store</a>
+      <a href="dashboard.html#licenses" class="nav-link">Your Licences</a>
+      <a href="helpcenter.html" class="nav-link">Help Center</a>
+      <a href="/api/auth/discord/login" class="login-btn" id="loginBtn">Log in</a>
+    </nav>
+  </header>
+
+
+
+  <main class="done" id="doneRoot"><div class="spinner"></div></main>
+
+  <footer class="site-footer">
+    <div class="footer__brand">
+      <div class="footer__brand-top"><img src="https://i.ibb.co/YTDKf9D7/image.png" alt="Elvira Technologies"><span>Elvira technologies</span></div>
+      <div class="footer__socials">
+        <a href="https://discord.gg/4bZDmEagpH" target="_blank" rel="noopener"><img src="https://i.ibb.co/v4B5LV3s/image.png" alt="Discord"></a>
+        <a href="https://www.roblox.com/es/communities/32391054/Aena-Group#!/about" target="_blank" rel="noopener"><img src="https://i.ibb.co/0pCpMZkv/image.png" alt="Roblox"></a>
+      </div>
+    </div>
+    <div class="footer__links">
+      <h4>Of Interest</h4>
+      <a href="helpcenter.html">Help center</a>
+      <a href="store.html">Products</a>
+      <a href="dashboard.html#licenses">Your Licences</a>
+    </div>
+    <div class="footer__payments"><img src="https://i.ibb.co/4ZsXPvNX/image.png" alt="Accepted payment methods"></div>
+  </footer>
+
+
+
+  <script>
+    if (window.top !== window.self) { try { window.top.location.replace(window.location.href); } catch (e) {} }
+    var navToggle = document.getElementById('navToggle');
+    var mainNav = document.getElementById('mainNav');
+    navToggle.addEventListener('click', function () { mainNav.classList.toggle('open'); navToggle.classList.toggle('open'); });
+
+    function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    var params=new URLSearchParams(location.search);
+    var code=(params.get('o')||'').toUpperCase();
+    var root=document.getElementById('doneRoot');
+
+    function flatApi(u){var m=/^(\/api\/[^\/?#]+\/[^\/?#]+)(\/[^?#]*)?(\?[^#]*)?$/.exec(u);if(!m||!m[2])return u;return m[1]+'?_p='+encodeURIComponent(m[2].replace(/^\//,''))+(m[3]?'&'+m[3].slice(1):'');}
+    function api(path,method,body){
+      return fetch(flatApi('/api/shop/'+path),{method:method,credentials:'same-origin',headers:{'Content-Type':'application/json','X-Requested-With':'elvira-shop'},body:body?JSON.stringify(body):undefined})
+        .then(function(r){return r.json().catch(function(){return {};}).then(function(d){return {ok:r.ok,status:r.status,d:d};});});
+    }
+
+    function show(num){
+      root.innerHTML=
+        '<iframe class="done__anim" title="Error animation" src="https://lottie.host/embed/403e606f-e8d8-456c-8221-f1d33ec1c40a/aXKER7UMwe.lottie"></iframe>'+
+        '<h1>Error '+esc(num)+' - We could not complete your purchase</h1>'+
+        '<p>Sorry, our automatic system could not complete your purchase or did not detect the payment. Please contact customer support to get technical help, or try again.</p>'+
+        '<a class="btn" href="yourorder.html">Try again</a>';
+    }
+
+    function load(){
+      api('order?o='+encodeURIComponent(code),'GET').then(function(res){
+        if(res.status===401){
+          root.innerHTML='<h1 style="margin-top:80px">Log in to continue</h1><p>Log in with the Discord account you used for this order.</p><a class="btn" href="/api/auth/discord/login?next='+encodeURIComponent('/ordererror.html?o='+code)+'">Log in</a>';
+          return;
+        }
+        if(!res.ok){ show(201); return; }
+        if(res.d.status==='paid'){ location.replace('ordercompleted.html?o='+encodeURIComponent(code)); return; }
+        show(res.d.failureCode||201);
+      }).catch(function(){ show(201); });
+    }
+
+    if(!/^[A-Z2-9]{3}-[A-Z2-9]{3}-[A-Z2-9]{3}$/.test(code)){ show(201); }
+    else if(params.get('c')==='cancelled'){
+      // The buyer pressed "cancel" on the Shoppex page.
+      api('order/cancel','POST',{o:code}).then(load).catch(load);
+    } else { load(); }
+  </script>
+  <script src="assets/js/elvira-auth.js"></script>
+  <script src="assets/js/elvira-cart.js"></script>
+</body>
+</html>

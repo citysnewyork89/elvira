@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account blocked - Elvira Technologies</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/1JGJ5f6C/image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --dark:#2D2D2D; --radius:8px; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Inter', sans-serif;
+    color:#fff;
+    background:var(--dark);
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    padding-top:146px;
+  }
+  img{display:block;max-width:100%;}
+  a{color:inherit;}
+
+  header.site-header{
+    width:100%;height:146px;background:var(--dark);display:flex;align-items:center;
+    padding:0 56px;position:fixed;top:0;left:0;z-index:20;
+  }
+  .site-header .logo img{height:44px;width:auto;}
+
+  .blocked{
+    max-width:640px;margin:0 auto;padding:72px 24px 96px;text-align:center;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .blocked h1{font-size:48px;font-weight:700;color:#fff;line-height:1.15;}
+  .blocked p{font-size:20px;font-weight:400;color:#D9D9D9;margin-top:20px;line-height:1.6;}
+  .blocked__reason{
+    margin-top:24px;background:#242424;border:1px solid #3d3d3d;border-radius:12px;
+    padding:18px 22px;font-size:15px;color:#fff;text-align:left;
+  }
+  .blocked__reason b{color:#D9D9D9;font-weight:600;}
+  .blocked__btn{
+    margin-top:32px;display:inline-flex;align-items:center;gap:10px;background:#fff;color:#000;
+    text-decoration:none;font-size:18px;font-weight:600;padding:16px 32px;border-radius:var(--radius);
+    transition:opacity .2s ease;
+  }
+  .blocked__btn:hover{opacity:.85;}
+  .blocked__btn img{width:22px;height:22px;}
+
+  @media (max-width:768px){
+    body{padding-top:88px;}
+    header.site-header{padding:0 24px;height:88px;}
+    .site-header .logo img{height:34px;}
+    .blocked{padding:48px 20px 72px;}
+    .blocked h1{font-size:30px;}
+    .blocked p{font-size:16px;}
+    .blocked__btn{width:100%;justify-content:center;font-size:16px;padding:15px 20px;}
+  }
+</style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">
+      <img src="https://i.ibb.co/yBG5pb82/image-32.png" alt="Elvira Technologies logo">
+    </a>
+  </header>
+
+  <main class="blocked">
+    <h1>You are blocked from the system</h1>
+    <p>We're sorry, you are permanently blocked from our system. If you wish to appeal or be unblocked, please contact an agent through our communications server.</p>
+    <div class="blocked__reason" id="reasonBox" style="display:none;">
+      <b>Reason given:</b> <span id="reasonText"></span>
+    </div>
+    <a href="https://discord.gg/4bZDmEagpH" target="_blank" rel="noopener" class="blocked__btn">
+      <img src="https://i.ibb.co/v4B5LV3s/image.png" alt="">
+      Contact us on Discord
+    </a>
+  </main>
+
+  <script>
+    fetch('/api/session', { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (session) {
+        if (!session.loggedIn) {
+          window.location.href = 'index.html';
+          return;
+        }
+        if (!session.blocked) {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        if (session.blockedReason) {
+          document.getElementById('reasonText').textContent = session.blockedReason;
+          document.getElementById('reasonBox').style.display = 'block';
+        }
+      })
+      .catch(function () {});
+  </script>
+
+</body>
+</html>
